@@ -12,7 +12,7 @@ char *psh_read_line() {
     }
 
     int c;
-    while(true) {
+    while(1) {
         c = getchar();
         if (c == EOF || c == '\n') {
             buffer[position] = '\0';
@@ -34,6 +34,38 @@ char *psh_read_line() {
     }
 }
 
+#define PSH_TOK_BUFSIZE 64
+#define PSH_TOK_DELIM " \t\n"
+char **psh_split_line(char *line) {
+    int bufsize = PSH_TOK_BUFSIZE;
+    char *token;
+    char **tokens = malloc(sizeof(char*) * PSH_TOK_BUFSIZE);
+    if (!tokens) {
+        fprintf(stderr, "lsh : allocation failed\n");
+        exit(EXIT_FAILURE);
+    }
+    int position = 0;
+
+    token = strtok(line,PSH_TOK_DELIM);
+    while(token != NULL) {
+        tokens[position] = token;
+        position++;
+
+        if (position >= bufsize) {
+            bufsize += PSH_TOK_BUFSIZE;
+            tokens = realloc(tokens, bufsize * sizeof(char*));
+            if (!tokens) {
+            fprintf(stderr, "lsh : allocation failed\n");
+            exit(EXIT_FAILURE);
+            }
+        }
+    }
+    tokens[position] = NULL;
+    return tokens;
+}
+
+int psh_launch(char **args) {
+}
 
 char *psh_loop() {
     char *line; //input
@@ -44,10 +76,10 @@ char *psh_loop() {
         printf("> ");
         line = psh_read_line();
         args = psh_split_line(line);
-        status = psh_execute(args);
+        //status = psh_execute(args);
 
-        free(line);
-        free(args);
+        //free(line);
+        //free(args);
     } while(status);
 }
 
